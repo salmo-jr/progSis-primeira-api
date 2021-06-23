@@ -6,11 +6,11 @@ app.use(express.json());
 
 const products = [];
 
-app.get('/produtos', (request, response) => {
+app.get('/products', (request, response) => {
     return response.json(products);
 });
 
-app.post('/produtos', (request, response) => {
+app.post('/products', (request, response) => {
     const { type, description } = request.body;
     const product = {
         id: v4(),
@@ -22,16 +22,35 @@ app.post('/produtos', (request, response) => {
     return response.json(product);
 });
 
-app.put('/produtos/:id', (request, response) => {
+app.put('/products/:id', (request, response) => {
     const { id } = request.params;
-    console.log('ID: ', id);
-    return response.json(['Pizza de Frango', 'Cerveja', 'Suco']);
+    const { type, description } = request.body;
+    const index = products.findIndex(p => p.id === id);
+
+    if (index < 0) {
+        return response.json({ error: 'Produto não encontrado.' });
+    }
+
+    const product = {
+        id: id,
+        type: type,
+        description: description,
+    }
+    products[index] = product;
+
+    return response.json(product);
 });
 
-app.delete('/produtos/:id', (request, response) => {
+app.delete('/products/:id', (request, response) => {
     const { id } = request.params;
-    console.log('ID: ', id);
-    return response.json(['Pizza de Frango', 'Cerveja']);
+
+    const index = products.findIndex(p => p.id === id);
+    if (index < 0) {
+        return response.json({ error: 'Produto não encontrado' });
+    }
+
+    products.splice(index, 1);
+    return response.json({ message: `O produto ${id} foi removido com sucesso` });
 });
 
 app.listen(3333);
