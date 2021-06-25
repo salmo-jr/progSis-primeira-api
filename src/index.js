@@ -1,14 +1,20 @@
 const { v4 } = require('uuid');
 const express = require('express');
+const { products } = require('./products');
 const app = express();
 
 app.use(express.json());
 
-const products = [];
-
 app.get('/products', (request, response) => {
     return response.json(products);
 });
+
+/* app.get('/products/search', (request, response) => {
+    const { text } = request.query;
+    const results = products.filter(p => p.description.length > 6);
+
+    return response.json(results);
+}); */
 
 app.post('/products', (request, response) => {
     const { type, description } = request.body;
