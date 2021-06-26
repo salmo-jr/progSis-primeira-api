@@ -1,8 +1,8 @@
 {
   "development": {
-    "username": "salmo",
-    "password": "123456",
-    "database": "master",
+    "username": "progsis",
+    "password": "progsis",
+    "database": "progsis",
     "host": "127.0.0.1",
     "dialect": "mssql"
   },
