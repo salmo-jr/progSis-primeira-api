@@ -9,12 +9,17 @@ app.get('/products', (request, response) => {
     return response.json(products);
 });
 
-/* app.get('/products/search', (request, response) => {
+app.get('/products/search', (request, response) => {
     const { text } = request.query;
-    const results = products.filter(p => p.description.length > 6);
+    if (text) {
+        const results = products.filter(p => p.description.toUpperCase().includes(text.toUpperCase()));
+        return response.json(results);
+    } else {
+        return response.json(products);
+    }
 
-    return response.json(results);
-}); */
+    
+});
 
 app.post('/products', (request, response) => {
     const { type, description } = request.body;
