@@ -1,5 +1,6 @@
 const { v4 } = require('uuid');
 const express = require('express');
+const { Product } = require('../models');
 const { products } = require('./products');
 const app = express();
 
@@ -21,16 +22,13 @@ app.get('/products/search', (request, response) => {
     
 });
 
-app.post('/products', (request, response) => {
-    const { type, description } = request.body;
-    const product = {
-        id: v4(),
-        type: type,
-        description: description
+app.post('/products', async (request, response) => {
+    try {
+        const prod = await Product.create(request.body);
+        return response.status(201).json(prod);
+    } catch (error) {
+        return response.status(500).json({ error: error.message });
     }
-    
-    products.push(product);
-    return response.json(product);
 });
 
 app.put('/products/:id', (request, response) => {
