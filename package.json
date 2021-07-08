@@ -1,12 +1,13 @@
 {
   "name": "primeira-api",
   "version": "1.0.0",
-  "main": "src/index.js",
+  "main": "src/server.js",
   "license": "MIT",
   "scripts": {
     "dev": "nodemon"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "express": "^4.17.1",
     "sequelize": "^6.6.4",
     "tedious": "^11.0.9",

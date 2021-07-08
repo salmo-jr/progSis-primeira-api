@@ -1,16 +1,15 @@
-const { v4 } = require('uuid');
-const express = require('express');
-const { Product } = require('../models');
-const { products } = require('./products');
-const app = express();
+var express = require('express');
+const { Product } = require('../../models');
+const { products } = require('../products');
+var productsRouter = express.Router();
 
-app.use(express.json());
+productsRouter.use(express.json());
 
-app.get('/products', (request, response) => {
+productsRouter.get('/', (request, response) => {
     return response.json(products);
 });
 
-app.get('/products/search', (request, response) => {
+productsRouter.get('/search', (request, response) => {
     const { text } = request.query;
     if (text) {
         const results = products.filter(p => p.description.toUpperCase().includes(text.toUpperCase()));
@@ -22,7 +21,7 @@ app.get('/products/search', (request, response) => {
     
 });
 
-app.post('/products', async (request, response) => {
+productsRouter.post('/', async (request, response) => {
     try {
         const prod = await Product.create(request.body);
         return response.status(201).json(prod);
@@ -31,7 +30,7 @@ app.post('/products', async (request, response) => {
     }
 });
 
-app.put('/products/:id', (request, response) => {
+productsRouter.put('/:id', (request, response) => {
     const { id } = request.params;
     const { type, description } = request.body;
     const index = products.findIndex(p => p.id === id);
@@ -50,7 +49,7 @@ app.put('/products/:id', (request, response) => {
     return response.json(product);
 });
 
-app.delete('/products/:id', (request, response) => {
+productsRouter.delete('/:id', (request, response) => {
     const { id } = request.params;
 
     const index = products.findIndex(p => p.id === id);
@@ -62,4 +61,4 @@ app.delete('/products/:id', (request, response) => {
     return response.json({ message: `O produto ${id} foi removido com sucesso` });
 });
 
-app.listen(3333);
+module.exports = productsRouter;
