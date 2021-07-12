@@ -1,24 +1,34 @@
 var express = require('express');
+const { Op } = require('sequelize');
 const { Product } = require('../../models');
-const { products } = require('../products');
 var productsRouter = express.Router();
 
 productsRouter.use(express.json());
 
-productsRouter.get('/', (request, response) => {
-    return response.json(products);
+productsRouter.get('/', async (request, response) => {
+    try {
+        const result = await Product.findAll();
+        return response.status(200).json(result);
+    } catch (error) {
+        return response.status(500).json({ error: error.message });
+    }
 });
 
-productsRouter.get('/search', (request, response) => {
+productsRouter.get('/search', async (request, response) => {
     const { text } = request.query;
-    if (text) {
-        const results = products.filter(p => p.description.toUpperCase().includes(text.toUpperCase()));
-        return response.json(results);
-    } else {
-        return response.json(products);
+    let products;
+    try {
+        if (text){
+            products = await Product.findAll({
+                where: { description: {[Op.substring]: text } }
+            });    
+        } else {
+            products = await Product.findAll();
+        }
+        response.status(200).json(products);
+    } catch (error) {
+        response.status(500).json({ error: error.message });
     }
-
-    
 });
 
 productsRouter.post('/', async (request, response) => {
@@ -30,35 +40,33 @@ productsRouter.post('/', async (request, response) => {
     }
 });
 
-productsRouter.put('/:id', (request, response) => {
+productsRouter.put('/:id', async (request, response) => {
     const { id } = request.params;
-    const { type, description } = request.body;
-    const index = products.findIndex(p => p.id === id);
-
-    if (index < 0) {
-        return response.json({ error: 'Produto não encontrado.' });
+    const product = request.body;
+    
+    const affectedRows = await Product.update(product, {
+        where: { id },
+    });
+    
+    if (affectedRows < 1) {
+        return response.status(404).json({ error: 'Produto não encontrado.' });
     }
 
-    const product = {
-        id: id,
-        type: type,
-        description: description,
-    }
-    products[index] = product;
-
-    return response.json(product);
+    return response.status(200).json({ success: 'Produto alterado com sucesso' });
 });
 
-productsRouter.delete('/:id', (request, response) => {
+productsRouter.delete('/:id', async (request, response) => {
     const { id } = request.params;
-
-    const index = products.findIndex(p => p.id === id);
-    if (index < 0) {
-        return response.json({ error: 'Produto não encontrado' });
+    
+    const affectedRows = await Product.destroy({
+        where: { id },
+    });
+    
+    if (affectedRows < 1) {
+        return response.status(404).json({ error: 'Produto não encontrado.' });
     }
 
-    products.splice(index, 1);
-    return response.json({ message: `O produto ${id} foi removido com sucesso` });
+    return response.status(200).json({ success: 'Produto removido com sucesso' });
 });
 
 module.exports = productsRouter;

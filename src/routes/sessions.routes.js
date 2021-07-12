@@ -17,9 +17,12 @@ sessionsRouter.post('/', async (request, response) => {
         }
 
         const passwordMatched = await bcryptjs.compare(password, user.password);
+        if (!passwordMatched){
+            return response.status(404).json({ error: 'Email e/ou senha incorreto(s).' });
+        }
 
-
-        return response.status(201).json({ok: true});
+        delete user.password;
+        return response.status(201).json(user);
     } catch (error) {
         return response.status(500).json({ error: error.message });
     }
