@@ -1,11 +1,11 @@
 const express = require('express');
-const { Product } = require('../models');
-const { products } = require('./products');
-const app = express();
+const { Op } = require('sequelize');
+const { Product } = require('../../models');
+const productsRouter = express.Router();
 
-app.use(express.json());
+productsRouter.use(express.json());
 
-app.get('/products', async (request, response) => {
+productsRouter.get('/', async (request, response) => {
     try {
         const result = await Product.findAll();
         return response.status(200).json(result);
@@ -14,19 +14,24 @@ app.get('/products', async (request, response) => {
     }
 });
 
-app.get('/products/search', (request, response) => {
+productsRouter.get('/search', async (request, response) => {
     const { text } = request.query;
-    if (text) {
-        const results = products.filter(p => p.description.toUpperCase().includes(text.toUpperCase()));
-        return response.json(results);
-    } else {
-        return response.json(products);
+    let results;
+    try {
+        if (text) {
+            results = await Product.findAll({
+                where: { description: { [Op.substring]: text } }
+            });
+        } else {
+            results = await Product.findAll();
+        }
+        return response.status(200).json(results);
+    } catch (error) {
+        return response.status(500).json({ error: error.message });
     }
-
-    
 });
 
-app.post('/products', async (request, response) => {
+productsRouter.post('/', async (request, response) => {
     try {
         const prod = await Product.create(request.body);
         return response.status(201).json(prod);
@@ -35,7 +40,7 @@ app.post('/products', async (request, response) => {
     }
 });
 
-app.put('/products/:id', async (request, response) => {
+productsRouter.put('/:id', async (request, response) => {
     const { id } = request.params;
     const product = request.body;
     
@@ -50,7 +55,7 @@ app.put('/products/:id', async (request, response) => {
     return response.status(200).json({ success: 'Produto alterado com sucesso' });
 });
 
-app.delete('/products/:id', async (request, response) => {
+productsRouter.delete('/:id', async (request, response) => {
     const { id } = request.params;
     
     const affectedRows = await Product.destroy({
@@ -64,4 +69,4 @@ app.delete('/products/:id', async (request, response) => {
     return response.status(200).json({ success: 'Produto removido com sucesso' });
 });
 
-app.listen(3333);
+module.exports = productsRouter;
