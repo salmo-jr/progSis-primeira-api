@@ -1,5 +1,6 @@
 var express = require('express');
 var bcryptjs = require('bcryptjs');
+var jwt = require('jsonwebtoken');
 const { User } = require('../../models');
 var sessionsRouter = express.Router();
 
@@ -21,8 +22,13 @@ sessionsRouter.post('/', async (request, response) => {
             return response.status(404).json({ error: 'Email e/ou senha incorreto(s).' });
         }
 
-        delete user.password;
-        return response.status(201).json(user);
+        const token = jwt.sign({}, 'secretkey', {
+            subject: user.id.toString(),
+            expiresIn: '1d',
+        });
+
+        user.password = undefined;
+        return response.status(201).json({ user, token });
     } catch (error) {
         return response.status(500).json({ error: error.message });
     }
