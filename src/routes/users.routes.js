@@ -1,4 +1,5 @@
 const express = require('express');
+const bcryptjs = require('bcryptjs');
 const { Op } = require('sequelize');
 const { User } = require('../../models');
 const usersRouter = express.Router();
@@ -32,9 +33,16 @@ usersRouter.get('/search', async (request, response) => {
 });
 
 usersRouter.post('/', async (request, response) => {
+    const { name, email, password } = request.body;
     try {
-        const prod = await User.create(request.body);
-        return response.status(201).json(prod);
+        const user = {
+            name,
+            email,
+            password: await bcryptjs.hash(password, 8),
+        }
+        const result = await User.create(user);
+        result.password = undefined;
+        return response.status(201).json(result);
     } catch (error) {
         return response.status(500).json({ error: error.message });
     }
