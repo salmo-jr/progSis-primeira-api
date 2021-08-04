@@ -3,7 +3,7 @@ const router = require('../src/routes');
 const app = express();
 
 app.use(express.json());
-app.use(router);
+//app.use(router);
 
 app.get('/test', (request, response) => {
     return response.json({ success: true });
