@@ -5,7 +5,7 @@ const app = express();
 app.use(express.json());
 //app.use(router);
 
-app.get('/test', (request, response) => {
+app.get('/', (request, response) => {
     return response.json({ success: true });
 });
 
