@@ -1,11 +1,11 @@
 {
   "name": "primeira-api",
   "version": "1.0.0",
-  "main": "api/server.js",
+  "main": "src/server.js",
   "license": "MIT",
   "scripts": {
     "dev": "nodemon",
-    "start": "node ./api/server.js"
+    "start": "node src/server.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
