@@ -33,8 +33,8 @@ function ensureAuthenticated(request, response, next) {
 
 routes.use(cors());
 routes.use('/sessions', sessionsRouter);
+routes.use('/users', usersRouter);
 routes.use(ensureAuthenticated);
 routes.use('/products', productsRouter);
-routes.use('/users', usersRouter);
 
 module.exports = routes;
